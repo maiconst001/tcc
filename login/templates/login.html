@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>login</title>
+       <!-- Compiled and minified CSS -->
+       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+       <!-- Compiled and minified JavaScript -->
+       <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+            
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    .erro-message {
+        color: red;
+        font-weight: bold;
+    }
+    
+    main {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        background-color: rgba(105, 106, 116, 0.068);
+    }
+
+    .header-area img {
+        width: 180px;
+        position: absolute;
+        z-index: 2;
+        transform: translateY(-20px);
+    }
+
+    .login-area {
+        max-width: 350px;
+        height: 100%;
+        max-height: 500px;
+        width: 100%;
+        box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.158);
+        border-radius: 4px;
+        background-color: white;
+        display: none;
+    }
+
+    .login-area .form {
+        padding: 10px;
+    }
+
+    .header-area {
+        height: 80px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-bottom: 40px;
+    }
+
+    .header-two {
+        padding: 10px;
+        font-weight: bold;
+        font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-size: 20px;
+    }
+
+
+    .send-area {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .send-area button {
+        width: 90%;
+        font-weight: bold;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    @media (max-width: 500px){
+        .login-area {
+            width: 100% !important;
+            max-width: 100%;
+            height: 100%;
+            max-height: 100%;
+            padding-top: 100px;
+        }
+    }
+</style>
+<body>
+    <main id="app" >
+        <div class="login-area" :style="login">
+            <div class="header-area">
+                <img src="../../static/if.png" alt="">
+            </div>
+            <div class="header-two">
+                <div class="title">Login</div>
+            </div>
+            <div class="form">
+                <div class="form-group">
+                  <label for="exampleInputEmail1">Endereço de email</label>
+                  <input v-model='email' name="email" value="videos2018pg@gmail.com" required type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Seu email">
+                </div>
+                <div class="form-group">
+                  <label for="exampleInputPassword1">Senha</label>
+                  <input v-model='password' name="password" value="maicon2018" required type="password" class="form-control" id="exampleInputPassword1" placeholder="Senha">
+                </div>
+                <div class="send-area">
+                    <button @click='entrar()' type="submit" class="btn btn-primary">Entrar</button>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+
+<script async>
+const app = new Vue({
+    el: '#app',
+    created: function () {
+        let token = localStorage.getItem('token') 
+        if (token){
+            this.verify(token)
+        }
+    },
+
+    data: {
+        login: {
+            display: 'initial',
+        },
+
+        email: '',
+        password: ''
+    },
+
+
+    methods: {
+        entrar: async function () {
+            const formData = new FormData()
+            formData.append('email', this.email)
+            formData.append('password', this.password)
+
+            M.toast({html: 'Entrando...'})
+            let data = await axios.post('http://127.0.0.1:5000/login', formData, {
+                headers:{
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+
+            let dt = data.data
+            if (dt.verified){
+
+                cookieStore.set({
+                    name: "token",
+                    value: dt.token,
+                })
+
+                localStorage.setItem('token', dt.token)
+                document.location.reload()
+            }else {
+                M.toast({html: 'Erro de login, verifique os dados!', classes: 'erro-message'})
+            }
+        },
+        verify: async function (token) {
+            let formData = new FormData()
+            formData.append('token', token)
+
+            let data = await axios.post('http://127.0.0.1:5000/verify', formData, {
+                headers:{
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+
+            let dt = data.data
+            if (dt.token && dt.verified){
+                document.location.replace('/')
+            }else {
+                localStorage.clear()
+            }
+        }
+    }
+})
+</script>
+
+
+</html>
