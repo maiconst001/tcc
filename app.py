@@ -182,8 +182,16 @@ def createAgenda():
     very = verify_token(token, app.config['SECRET_KEY'], User)
     if very['status']:
 
+        labsall = Labs.query.all()
+        if (not labsall):
+            return jsonify({
+                'status': False,
+                'message': 'Erro! Nenhum lab cadastrado!',
+                'type': 'erro'
+            })
 
         Agenda_m = Agenda.query.filter_by(data=data).all()
+
 
 
         for a in Agenda_m:

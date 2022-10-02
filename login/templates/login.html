@@ -153,7 +153,7 @@ const app = new Vue({
             formData.append('password', this.password)
 
             M.toast({html: 'Entrando...'})
-            let data = await axios.post('http://127.0.0.1:5000/login', formData, {
+            let data = await axios.post('/login', formData, {
                 headers:{
                     'Content-Type': 'multipart/form-data'
                 }
@@ -177,7 +177,7 @@ const app = new Vue({
             let formData = new FormData()
             formData.append('token', token)
 
-            let data = await axios.post('http://127.0.0.1:5000/verify', formData, {
+            let data = await axios.post('/verify', formData, {
                 headers:{
                     'Content-Type': 'multipart/form-data'
                 }
